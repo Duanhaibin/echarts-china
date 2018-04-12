@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>数据图表</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    .content {
+      padding-top: 20px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .chart_map {
+      width: 100%;
+      height: 800px;
+      margin-bottom: 30px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="content">
+    <div class="chart_map" id="chart_map"></div>
+  </div>
+
+  <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+  <script src="js/echarts.min.js"></script>
+  <script>
+    var map = echarts.init(document.getElementById('chart_map'));
+
+    var option = {
+        title: {
+            text: '投诉来源分布',
+            subtext: '160万条数据',
+        },
+        tooltip: {
+            trigger: 'item',
+            formatter: '{b}<br/>{c}(条)'
+        },
+        visualMap: {
+            min: 0,
+            max: 1000,
+            text: ['High', 'Low'],
+            realtime: true,
+            calculable: true,
+            inRange: {
+                color: ['lightskyblue', 'yellow', 'orangered','green','#fff']
+            },
+            visualMap: {
+                show: true
+            }
+        },
+
+    };
+
+    map.on('click', function (param) {
+        // console.log(param)            //param.data.name是点击的地域名字。点击对象
+        if (!param.data.properties.id) {
+            return                    //param.data.properties.id是点击地域的id。
+        }
+        if (param.data.type === 0) {  //0是点击的省级。
+            reData(param.data.properties.id)
+        }
+        if (param.data.type === 1) {  //1是点击的市级。  
+            if(param.data.properties.id.length == 6 ){
+                china();
+            }else{
+                getCouties(param.data.properties.id)
+            }
+        }
+        if (param.data.type === 2) {  //2是点击的县。
+            china();
+        }
+    });
+
+    china();
+    // getCouties('3201');    //南京初始化。南京市的id 是3201.
+
+    function china() {
+        $.get('/geo/china.json', function(geoJson) {
+        echarts.registerMap('china', geoJson);
+
+        var data = geoJson.features.map(function(t) {
+            return {
+                name: t.properties.name,
+                value: Math.round(Math.random()*1000),
+                type: 0,
+                properties: t.properties
+            }
+        });
+
+        data.push({
+            name: '南海诸岛',
+            value: 0,
+            properties: {}
+        })
+
+        option.series = [{
+            name: '投诉量',
+            type: 'map',
+            mapType: 'china',
+           // scaleLimit: { min: 0.8, max: 1.9 },//缩放
+           //                       mapLocation:{ 
+           //                          y:60 
+           //                      }, 
+            itemStyle: {
+                normal: {
+                label: {
+                    show: true
+                }
+            },
+            emphasis: {
+                label: {
+                    show: true
+                }
+                }
+            },
+            data: data
+        }];
+
+        map.setOption(option);
+      });
+    }
+
+
+    function reData(id) {
+      $.get('/geo/geometryProvince/'+ id +'.json', function(geoJson) {
+        echarts.registerMap(id, geoJson);
+
+        var data = geoJson.features.map(function(t) {
+            return {
+                name: t.properties.name,
+                value: Math.round(Math.random()*1000),
+                type: 1,
+                properties: t.properties
+            }
+        });
+
+        option.series = [{
+            name: '投诉量',
+            type: 'map',
+            mapType: id,
+            itemStyle: {
+                normal: {
+                    label: {
+                        show: true
+                    }
+                },
+                emphasis: {
+                    label: {
+                        show: true
+                    }
+                }
+            },
+            data: data
+        }];
+
+        map.setOption(option);
+      });
+    }
+
+    function getCouties(id) {
+        $.get('/geo/geometryCouties/'+ id +'00.json', function(geoJson) {
+        echarts.registerMap(id, geoJson);
+
+        var data = geoJson.features.map(function(t) {
+            return {
+                name: t.properties.name,
+                value: Math.round(Math.random()*1000),
+                type: 2,
+                properties: t.properties
+            }
+        });
+
+        option.series = [{
+            name: '投诉量',
+            type: 'map',
+            mapType: id,
+            itemStyle: {
+                normal: {
+                    label: {
+                        show: true
+                    }
+                },
+                emphasis: {
+                    label: {
+                        show: true
+                    }
+                }
+            },
+            data: data
+            }];
+
+            map.setOption(option);
+        });
+    }
+  </script>
+</body>
+
+</html>

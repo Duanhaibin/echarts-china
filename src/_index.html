@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>数据图表</title>
+    <style>
+    body {
+        margin: 0;
+        padding: 0;
+    }
+    .content {
+        padding-top: 20px;
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+    .chart_map {
+        width: 100%;
+        height: 800px;
+        margin-bottom: 30px;
+    }
+    .chart_bar {
+        width: 100%;
+        height: 800px;
+        margin-bottom: 30px;
+    }
+    .chart_pie {
+        width: 100%;
+        height: 500px;
+        margin-bottom: 30px;
+    }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <div class="chart_map" id="chart_map"></div>
+    </div>
+
+    <div class="content">
+        <div class="chart_bar chart_bar-hook"></div>
+    </div>
+
+    <div class="content">
+        <div class="chart_pie chart_pie-hook"></div>
+    </div>
+
+    <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <script src="js/echarts.min.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+
+        // charmap(data) 热更新数据
+        var charmap = charMap(
+            // 启动加载 全国的数据
+            function(callback) {
+                $.get('/china').then(function(res) {
+                    callback(res)
+
+                    // 垂直柱状图
+                    $('.chart_bar-hook').charVerbar(res, '导游各省排行');
+
+                    // 饼状图
+                    $('.chart_pie-hook').charPie(res, '导游数量全国各省占比');
+                })
+            },
+            // 点击加载省级数据
+            function(name, callback) {
+                $.get('/area?name=' + encodeURI(name)).then(function(res) {
+                    callback(res)
+                })
+            }
+        );
+
+    </script>
+</body>
+</html>

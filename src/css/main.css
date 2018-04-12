@@ -1,0 +1,44 @@
+@charset "utf-8";
+/*!
+ * 统计图表 v0.1.0Beta
+ * 
+ * 
+ */
+
+ body {
+     background: #eee;
+ }
+
+.container {
+    padding: 20px;
+}
+
+.panel-singplay {
+    border-color: #ddd;
+}
+.panel-singplay > .panel-heading {
+    color: #364860;
+    font-size: 16px;
+    background-color: #fff;
+    border-color: #ddd;
+    border-left: 4px solid #364860;
+}
+
+.select-singplay {
+    width: 260px !important;
+}
+
+/* charts */
+.char-map {
+    height: 500px;
+}
+
+.w100 {
+    width: 100px;
+}
+.h400 {
+    height: 400px;
+}
+.h800 {
+    height: 700px;
+}

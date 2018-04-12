@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>导游数据统计分析</title>
+    <link rel="stylesheet" href="css/vendor.css">
+    <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+<div class="container">
+    <div class="row">
+
+        <div class="col-md-12">
+            <div class="panel panel-singplay">
+                <div class="panel-heading">导游数据统计概览</div>
+                <div class="panel-body">
+                    <div class="char-map" id="chart_map"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="panel panel-singplay">
+                <div class="panel-heading">导游数量各省排行</div>
+                <div class="panel-body">
+                    <div class="chart-bar-hook h800"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="panel panel-singplay">
+                <div class="panel-heading">导游数量各省占比</div>
+                <div class="panel-body">
+                    <div class="chart-pie-hook h800"></div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>
+<script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+<script src="js/echarts.all.min.js"></script>
+<script src="js/main.js"></script>
+<script>
+$(function() {
+        
+    var charmap = charMap(
+        // 启动加载 全国的数据
+        function(callback) {
+            $.get('/china').then(function(res) {
+                callback(res)
+                
+                // 垂直柱状图
+                $('.chart-bar-hook').charVerbar(res, '导游数量各省排行');
+                
+                // 饼状图
+                $('.chart-pie-hook').charPie(res, '导游数量全国各省占比');
+            })
+        },
+        // 点击加载省级数据
+        function(name, callback) {
+            $.get('/area?name=' + encodeURI(name)).then(function(res) {
+                callback(res)
+            })
+        }
+    );
+
+});
+</script>
+</body>
+</html>
